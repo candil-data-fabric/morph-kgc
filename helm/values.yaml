@@ -5,7 +5,7 @@ configmap_config: configmap-config
 configmap_mapping: configmap-mapping
 
 image:
-  repository: morph-kgc
+  repository: ghcr.io/candil-data-fabric/morph-kgc
   tag: latest
   pullPolicy: IfNotPresent
 
