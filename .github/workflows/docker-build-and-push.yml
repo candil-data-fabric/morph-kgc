@@ -23,7 +23,7 @@ jobs:
 
     # Build the Docker image:
     - name: Build Docker image
-      run: docker build -t ghcr.io/${{ github.repository }}:latest --build-arg optional_dependencies=test,kafka,sqlite,mysql,postgresql,oracle,mssql,excel,tabular,spss,kuzu,neo4j .
+      run: docker build -t ghcr.io/${{ github.repository }}:latest --build-arg optional_dependencies="all" .
 
     # Push the Docker image to GitHub Packages:
     - name: Push Docker image to GitHub Packages
