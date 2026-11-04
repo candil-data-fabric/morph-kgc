@@ -6,8 +6,9 @@ FROM python:3.9-slim as python-base
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         curl \
-        build-essential
-        
+        build-essential \
+        zlib1g-dev
+
 ################################
 # BUILDER-BASE
 # Used to build deps + create our virtual environment
@@ -16,6 +17,10 @@ FROM python-base as builder-base
 RUN pip install hatch
 ENV PYSETUP_PATH="/opt/pysetup" \
     VENV_PATH="/opt/pysetup/.venv"
+
+RUN python -m venv "$VENV_PATH"
+ENV VIRTUAL_ENV="$VENV_PATH" \
+    PATH="$VENV_PATH/bin:$PATH"
 
 COPY pyproject.toml ./
 ARG optional_dependencies
@@ -36,13 +41,14 @@ RUN if [ -n "$optional_dependencies" ]; then \
         echo "No optional dependencies specified."; \
     fi
 
-
 ################################
 # PRODUCTION
 # Final image used for runtime
 ################################
 FROM python-base as production
-COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+ENV VIRTUAL_ENV="/opt/pysetup/.venv" \
+    PATH="/opt/pysetup/.venv/bin:$PATH"
+COPY --from=builder-base /opt/pysetup/.venv /opt/pysetup/.venv
 COPY ./src /app
 WORKDIR /app
 ENTRYPOINT ["python", "-m", "morph_kgc"]
